@@ -1,0 +1,49 @@
+= crisp-mini-wrangler
+
+Crisp Take Home Assignment
+
+== Assumptions
+
+. [[a-1]]Every input CSV file contains only records of one type, i.e. record-based text formats are not supported
+. [[a-2]]Every input CSV file contains exactly one header row designating the contained record's fields
+. [[a-3]]The order of records in the output may differ from that in the input. Assuming an analytics data ingestion context, this should be fine.
+
+== Architecture Decision Records
+
+=== ADR 1: Stream Based Architecture
+
+**Status:** proposed
+
+**Decision**
+
+Since the requirements state that the input files may be potentially very large, the application will be able
+to deal with potentially unbounded streams of records.
+
+**Consequences**
+
+=== ADR 2: Transformations are run asynchronously
+
+**Status:** proposed 
+
+**Context**
+
+Transformations can be simple and fast for basic text wrangling, but can also grow complex and even
+have the need to access external systems. E.g. if an output field is required to contain the date of the
+maximum shelf live, this information could be required to be retrieved from a master data system of some
+sort. Another example would be to take shipping times or opening hours of a store into consideration for date
+calculations.
+
+**Decision**
+
+Since the order of records does not matter for our purposes (see <<a-3>>), we can run transformations
+in an async fashion.
+
+```
+Stream<Record> -> Dispatch to Transformer Worker -> Transform -> Stream<Record>
+
+```
+
+**Consequences**
+
+* Costly transformations can be performed in parallel
+* The order of output records is not guaranteed (see <<a-3>>)
