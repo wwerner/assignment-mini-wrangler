@@ -1,17 +1,23 @@
 = crisp-mini-wrangler
 
-Crisp Take Home Assignment
+Crisp Take Home Assignment - Mini CSV Wrangler
+
 
 == Assumptions
 
 . [[a-1]]Every input CSV file contains only records of one type, i.e. record-based text formats are not supported
 . [[a-2]]Every input CSV file contains exactly one header row designating the contained record's fields
 . [[a-3]]The order of records in the output may differ from that in the input. Assuming an analytics data ingestion context, this should be fine.
-- [[a-4]]Field types do not need to be specified within the external DSL, we can provide a pool of field types and transformations and configure the system using these
+. [[a-4]]Field types do not need to be specified within the external DSL, we can provide a pool of field types and transformations and configure the system using these
+. [[a-5]]We don't need a rich domain model for the CSV data, as it is bound to differ per input format
+. [[a-6]]We can't use an internal (Kotlin) DSL, as the requirements explicitly state otherwise. I assume that the mappings are not
+created by core developers but rather analysts/consultants, potentially from customer's staff.
+. [[a-7]]While ideally the CSV parser used supports different encodings, this application assumes the input to be in UTF-8
+. [[a-8]]TODO: Which Decimal Formats?
 
 == Architecture Decision Records
 
-=== ADR 1: Stream Based Architecture
+=== [[adr-1]]ADR 1: Stream Based Architecture
 
 **Status:** proposed
 
@@ -22,7 +28,7 @@ to deal with potentially unbounded streams of records.
 
 **Consequences**
 
-=== ADR 2: Transformations are run asynchronously
+=== [[adr-2]]ADR 2: Transformations are run asynchronously
 
 **Status:** proposed 
 
@@ -51,3 +57,43 @@ Stream<Record> -> Dispatch to Transformer Worker -> Transform -> Stream<Record>
 * Costly transformations can be performed in parallel.
 * The system is able to transform rows either in parallel or sequentially
 * The order of output records is not guaranteed if processed in parallel (see <<a-3>>)
+
+=== [[adr-3]]ADR 3: CSV Parser
+
+**Status:** proposed
+
+**Context**
+
+While implementing a CSV parser by simply splitting rows at a delimiter character seems
+simple at the first glance, there are a lot of things that actually need to be taken into
+consideration (escaping delimiters in text columns, text delimiting, line breaks in texts, different line separators etc.).
+
+For the JVM, a lot of CSV parser libraries are available, though some of which are quite dated. Univocity, a supplier of commercial
+data ingestion products, provides a https://github.com/uniVocity/csv-parsers-comparison#jdk-8[performance comparison].
+
+When selecting a parser, we need to make sure that it can perform in a streaming fashion as not to break <<adr-1>>.
+
+We don't need advanced mapping to objects (as we'll deal with multiple formats as opposed to having a rich domain model),
+as we will provide and run our own transformations on the parsed data, only robust and fast async parsing of CSV records.
+
+**Decision**
+
+We're using https://simpleflatmapper.org/0101-getting-started-csv.html[SimpleFlatMapper].
+
+The SimpleFlatMapper CSV module is the fastest OSS parser in the comparison mentioned above.
+It is actively being developed, with ~20 releases in 2019 so far and 300 stars on github.
+
+SFM supports callback, iterator and stream based parsing.
+
+Detailed performance stats by the SFM team https://simpleflatmapper.org/12-csv-performance.html[here].
+
+We're using the raw parser flavor as not to ...
+
+* ... tie our implementation to much into a parser implementation
+* ... introduce runtime overhead for object mapping
+
+
+**Consequences**
+
+
+

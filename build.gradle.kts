@@ -7,6 +7,7 @@ repositories {
 }
 
 dependencies {
+    compile("org.simpleflatmapper:sfm-csv:7.0.3")
     implementation(kotlin("stdlib-jdk8"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.0")
 
