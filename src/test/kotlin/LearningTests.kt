@@ -26,26 +26,50 @@ class LearningTests {
     }
 
     @Test
-    fun `can parse CSV as stream`() = runBlocking {
-        val start = System.currentTimeMillis()
+    // Careful, this one runs quite some time
+    fun `compare sync and async processing`() = runBlocking {
+        val recordCounts = arrayOf(100, 1000, 10000, 100000)
+        val sleepTimes = arrayOf(0L, 10L, 100L)
 
-        File("src/test/resources/orders-10000.csv").bufferedReader().use {
-            CsvParser
-                .skip(1)
-                .stream(it)
-                .forEach { row ->
+        val results = StringBuilder("|===\n")
+        results.append("|Rows|Transformation ms|Duration sync ms|Duration async ms\n")
+
+
+        for (recordCount in recordCounts) {
+            createTestFile(recordCount)
+            for (sleepTime in sleepTimes) {
+
+                val testFile = "src/test/resources/orders-$recordCount.csv"
+                val startAsync = System.currentTimeMillis()
+                val mockRecords = produceCsvRecordsFromFile(testFile)
+                val output = transformRecord(mockRecords, sleepTime)
+                for (transformedRow in output) {
                     launch(Dispatchers.Default) {
-                        log(asyncTransform(row).joinToString(","))
+                        log(transformedRow.await().joinToString(","))
                     }
                 }
+                val endAsync = System.currentTimeMillis()
+
+                val startSync = System.currentTimeMillis()
+                File(testFile).bufferedReader().use {
+                    CsvParser
+                        .skip(1)
+                        .stream(it)
+                        .forEach { row ->
+                            log(transform(row, sleepTime).joinToString(","))
+                        }
+                }
+                val endSync = System.currentTimeMillis()
+
+                results.append("|$recordCount|$sleepTime|${endSync - startSync}|${endAsync - startAsync}\n")
+            }
         }
-        log("Parsed input in ${System.currentTimeMillis() - start} ms")
+        results.append("|===")
+        println(results)
     }
 
 
-    @Test
-    fun createTestFile() = runBlocking {
-        val recordCount = 10_000
+    private fun createTestFile(recordCount: Int) = runBlocking {
         val mockRecords = produceMockRecords(recordCount)
 
         File("src/test/resources/orders-$recordCount.csv").bufferedWriter().use { out ->
@@ -84,17 +108,19 @@ class LearningTests {
         transform(row)
     }
 
-    private suspend fun asyncTransform(row: Array<String>): Array<String> = withContext(Dispatchers.Default) {
-        transform(row)
-    }
+    private suspend fun asyncTransform(row: Array<String>, duration: Long): Array<String> =
+        withContext(Dispatchers.Default) {
+            transform(row, duration)
+        }
 
     private fun transform(row: String): String {
         Thread.sleep(1000)
         return "[transformed] $row"
     }
 
-    private fun transform(row: Array<String>): Array<String> {
-        //Thread.sleep(1000)
+    private fun transform(row: Array<String>, duration: Long?): Array<String> {
+        if (duration !== null)
+            Thread.sleep(duration)
         row[0] = "[transformed]" + row[0]
         return row
     }
@@ -117,12 +143,30 @@ class LearningTests {
             )
             cnt++;
         }
-        channel.close()
+    }
+
+    private fun CoroutineScope.produceCsvRecordsFromFile(file: String) = produce<Array<String>> {
+        File(file).bufferedReader().use {
+            CsvParser
+                .skip(1)
+                .stream(it)
+                .forEach { row -> launch(Dispatchers.Default) { send(row) } }
+        }
     }
 
     fun CoroutineScope.transform(rows: ReceiveChannel<String>): ReceiveChannel<Deferred<String>> = produce {
         for (row in rows) {
             val transformedRow = async { asyncTransform(row) }
+            send(transformedRow)
+        }
+    }
+
+    fun CoroutineScope.transformRecord(
+        rows: ReceiveChannel<Array<String>>,
+        duration: Long
+    ): ReceiveChannel<Deferred<Array<String>>> = produce {
+        for (row in rows) {
+            val transformedRow = async { asyncTransform(row, duration) }
             send(transformedRow)
         }
     }
