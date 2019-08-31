@@ -26,7 +26,7 @@ class LearningTests {
     }
 
     @Test
-    // Careful, this one runs quite some time
+    @Disabled("This test runs ~3h on an i7 8 core, only enable it if you really want to run the performance comparison")
     fun `compare sync and async processing`() = runBlocking {
         val recordCounts = arrayOf(100, 1000, 10000, 100000)
         val sleepTimes = arrayOf(0L, 10L, 100L)
@@ -78,8 +78,8 @@ class LearningTests {
                 out.write(row)
                 out.write("\n")
             }
-
         }
+
     }
 
 
