@@ -8,6 +8,7 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.0")
 
     testCompile("org.assertj:assertj-core:3.11.1")
     testImplementation(kotlin("test"))

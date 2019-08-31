@@ -7,6 +7,7 @@ Crisp Take Home Assignment
 . [[a-1]]Every input CSV file contains only records of one type, i.e. record-based text formats are not supported
 . [[a-2]]Every input CSV file contains exactly one header row designating the contained record's fields
 . [[a-3]]The order of records in the output may differ from that in the input. Assuming an analytics data ingestion context, this should be fine.
+- [[a-4]]Field types do not need to be specified within the external DSL, we can provide a pool of field types and transformations and configure the system using these
 
 == Architecture Decision Records
 
@@ -37,6 +38,8 @@ calculations.
 
 Since the order of records does not matter for our purposes (see <<a-3>>), we can run transformations
 in an async fashion.
+It must be able to turn off async behavior, since, if the transformation is cheap, processing in parallel may well be faster.
+We'll need to run a performance comparison later on.
 
 ```
 Stream<Record> -> Dispatch to Transformer Worker -> Transform -> Stream<Record>
@@ -45,5 +48,6 @@ Stream<Record> -> Dispatch to Transformer Worker -> Transform -> Stream<Record>
 
 **Consequences**
 
-* Costly transformations can be performed in parallel
-* The order of output records is not guaranteed (see <<a-3>>)
+* Costly transformations can be performed in parallel.
+* The system is able to transform rows either in parallel or sequentially
+* The order of output records is not guaranteed if processed in parallel (see <<a-3>>)
