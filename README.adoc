@@ -2,7 +2,38 @@
 
 Crisp Take Home Assignment - Mini CSV Wrangler
 
+== Run
 
+=== Configuration
+
+Transformation configurations define ...
+
+* ... the columns in the input file and their expected order,
+* ... fields in the output,
+* ... the transformation from one or more input columns to an output field
+* ... the output serialization formats
+
+.Configuration Example
+```
+Transformation {
+    input {"Order Number","Year","Month","Day"}
+    record {
+        field("OrderID", IntegerField("Order Number"))
+        field("OrderDate", DateField("Year","Month","Day"))
+        field("OrderUnit", ConstantField("kg))
+    }
+    output {
+        records {
+            format = "$OrderID,$OrderDate,$OrderUnit\n"
+            stdout
+            file("./output.csv")
+        }
+        errors {
+             stderr
+         }
+    }
+}
+```
 == Assumptions
 
 . [[a-1]]Every input CSV file contains only records of one type, i.e. record-based text formats are not supported
@@ -32,7 +63,7 @@ A writeup on truecasing methods: https://towardsdatascience.com/truecasing-in-na
 by the timezone of dates represented as `String` and the corresponding type unmarshalling mechanism. I consider this out
 of scope for now.
 . [[a-12]] FIXME: Decimal format representation
-
+. [[a-13]] The transformation to an output record does not require data from multiple input rows.
 
 == Architecture Decision Records
 
