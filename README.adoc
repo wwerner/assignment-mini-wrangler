@@ -15,7 +15,7 @@ Transformation configurations define ...
 
 .Configuration Example
 ```
-Transformation {
+transformation {
     input {"Order Number","Year","Month","Day"}
     record {
         field("OrderID", IntegerField("Order Number"))
@@ -34,6 +34,8 @@ Transformation {
     }
 }
 ```
+
+
 == Assumptions
 
 . [[a-1]]Every input CSV file contains only records of one type, i.e. record-based text formats are not supported

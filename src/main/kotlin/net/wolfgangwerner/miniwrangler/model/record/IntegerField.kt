@@ -1,4 +1,4 @@
-package net.wolfgangwerner.miniwrangler
+package net.wolfgangwerner.miniwrangler.model.record
 
 class IntegerField : Field<Int>() {
     override fun unmarshal(data: String) {

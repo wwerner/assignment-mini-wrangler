@@ -1,6 +1,5 @@
-package net.wolfgangwerner.miniwrangler
+package net.wolfgangwerner.miniwrangler.model.record
 
-import java.text.DateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 

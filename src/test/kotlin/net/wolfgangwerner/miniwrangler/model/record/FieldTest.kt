@@ -1,9 +1,9 @@
-package test.kotlin
+package test.kotlin.net.wolfgangwerner.miniwrangler.model.record
 
-import net.wolfgangwerner.miniwrangler.DateField
-import net.wolfgangwerner.miniwrangler.DecimalField
-import net.wolfgangwerner.miniwrangler.IntegerField
-import net.wolfgangwerner.miniwrangler.StringField
+import net.wolfgangwerner.miniwrangler.model.record.DateField
+import net.wolfgangwerner.miniwrangler.model.record.DecimalField
+import net.wolfgangwerner.miniwrangler.model.record.IntegerField
+import net.wolfgangwerner.miniwrangler.model.record.StringField
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance

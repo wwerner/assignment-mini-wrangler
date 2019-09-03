@@ -1,4 +1,4 @@
-package net.wolfgangwerner.miniwrangler
+package net.wolfgangwerner.miniwrangler.model.record
 
 abstract class Field<T : Any> {
     protected lateinit var value: T

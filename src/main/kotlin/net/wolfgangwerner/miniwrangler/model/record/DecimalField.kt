@@ -1,4 +1,4 @@
-package net.wolfgangwerner.miniwrangler
+package net.wolfgangwerner.miniwrangler.model.record
 
 import java.math.BigDecimal
 import java.text.DecimalFormat
