@@ -2,3 +2,5 @@
 mini-wrangler.iml
 out
 src/test/resources/orders-*.csv
+.gradle
+build
