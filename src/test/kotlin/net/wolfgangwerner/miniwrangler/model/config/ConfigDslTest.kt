@@ -32,17 +32,17 @@ class ConfigDslTest {
     }
 
     @Test
-    fun `transformation element can be parsed`() {
-        testDsl(
-            Transformation(), """
-            import net.wolfgangwerner.miniwrangler.model.config.*
-            transformation {}    
-        """.trimIndent()
+    fun `DSL string can be evaluated`() {
+        assertThat(
+            Transformation()
+        ).isEqualTo(
+            scriptEngine.eval(
+            """
+                import net.wolfgangwerner.miniwrangler.model.config.*
+                transformation {}    
+            """.trimIndent()
+            )
         )
     }
 
-    private fun testDsl(expected: Transformation, dsl: String) {
-
-        assertThat(expected).isEqualTo(scriptEngine.eval(dsl))
-    }
 }
