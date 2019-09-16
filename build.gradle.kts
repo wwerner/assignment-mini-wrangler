@@ -22,6 +22,12 @@ dependencies {
 
     testCompile("org.assertj:assertj-core:3.11.1")
     testImplementation("com.github.javafaker:javafaker:1.0.1")
-    testImplementation(kotlin("test"))
-    testImplementation(kotlin("test-junit5"))
+    testImplementation("org.junit.jupiter:junit-jupiter:5.5.2")
+}
+
+tasks.test {
+    useJUnitPlatform()
+    testLogging {
+        events("passed", "skipped", "failed")
+    }
 }
