@@ -29,9 +29,23 @@ class FieldTest {
         assertThat(field.value()).isEqualTo(Integer.valueOf(42))
     }
     @Test
-    fun `Date field can be parsed`() {
+    fun `Date field can be parsed from pattern`() {
         val field = DateField("yyyy-MM-dd")
         field.unmarshal("2019-08-31")
+        assertThat(field.value()).isEqualTo(LocalDate.of(2019,8,31))
+    }
+
+    @Test
+    fun `Date field can be parsed integer args`() {
+        val field = DateField("")
+        field.unmarshal(2019, 8, 31)
+        assertThat(field.value()).isEqualTo(LocalDate.of(2019,8,31))
+    }
+
+    @Test
+    fun `Date field can be parsed from string args`() {
+        val field = DateField("")
+        field.unmarshal("2019","08","31")
         assertThat(field.value()).isEqualTo(LocalDate.of(2019,8,31))
     }
 
