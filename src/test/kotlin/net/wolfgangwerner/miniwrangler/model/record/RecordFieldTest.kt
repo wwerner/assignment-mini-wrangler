@@ -12,47 +12,37 @@ import java.time.LocalDate
 
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class FieldTest {
+class RecordFieldTest {
     @Test
     fun `String field can be parsed`() {
         val input = "Tapioca"
-        val field = StringField()
-        field.unmarshal(input)
-        assertThat(field.value()).isEqualTo(input)
+        val field = StringField("f")
+        assertThat(field.unmarshal(input)).isEqualTo(input)
     }
 
     @Test
     fun `Integer field can be parsed`() {
         val input = "42"
-        val field = IntegerField()
+        val field = IntegerField("f")
         field.unmarshal(input)
-        assertThat(field.value()).isEqualTo(Integer.valueOf(42))
-    }
-    @Test
-    fun `Date field can be parsed from pattern`() {
-        val field = DateField("yyyy-MM-dd")
-        field.unmarshal("2019-08-31")
-        assertThat(field.value()).isEqualTo(LocalDate.of(2019,8,31))
+        assertThat(field.unmarshal(input)).isEqualTo(Integer.valueOf(42))
     }
 
     @Test
-    fun `Date field can be parsed integer args`() {
-        val field = DateField("")
-        field.unmarshal(2019, 8, 31)
-        assertThat(field.value()).isEqualTo(LocalDate.of(2019,8,31))
+    fun `Date field can be parsed from pattern`() {
+        val field = DateField("f", "yyyy-MM-dd")
+        assertThat(field.unmarshal("2019-08-31")).isEqualTo(LocalDate.of(2019, 8, 31))
     }
 
     @Test
     fun `Date field can be parsed from string args`() {
-        val field = DateField("")
-        field.unmarshal("2019","08","31")
-        assertThat(field.value()).isEqualTo(LocalDate.of(2019,8,31))
+        val field = DateField("f", "")
+        assertThat(field.unmarshal("2019", "08", "31")).isEqualTo(LocalDate.of(2019, 8, 31))
     }
 
     @Test
     fun `Decimal field can be parsed`() {
-        val field = DecimalField("#,##0.0#")
-        field.unmarshal("5,250.50")
-        assertThat(field.value() as BigDecimal).isEqualByComparingTo(BigDecimal(5250.50))
+        val field = DecimalField("f","#,##0.0#")
+        assertThat(field.unmarshal("5,250.50") as BigDecimal).isEqualByComparingTo(BigDecimal(5250.50))
     }
 }

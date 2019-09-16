@@ -1,15 +1,7 @@
 package net.wolfgangwerner.miniwrangler.model.record
 
-abstract class Field<T : Any> {
-    protected lateinit var value: T
+abstract class RecordField<out T>(public val name: String) {
+    val columns : MutableList<String> = mutableListOf()
+    abstract fun unmarshal(vararg data: String): T
 
-    abstract fun unmarshal(data: String)
-
-    open fun marshal(data: String): String {
-        return value.toString()
-    }
-
-    public fun value(): Any {
-        return value
-    }
 }
