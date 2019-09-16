@@ -53,6 +53,6 @@ class FieldTest {
     fun `Decimal field can be parsed`() {
         val field = DecimalField("#,##0.0#")
         field.unmarshal("5,250.50")
-        assertThat(field.value()).isEqualByComparingTo(BigDecimal(5250.50))
+        assertThat(field.value() as BigDecimal).isEqualByComparingTo(BigDecimal(5250.50))
     }
 }

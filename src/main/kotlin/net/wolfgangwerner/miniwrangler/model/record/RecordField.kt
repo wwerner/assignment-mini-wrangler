@@ -9,5 +9,7 @@ abstract class Field<T : Any> {
         return value.toString()
     }
 
-    public fun value() = value
+    public fun value(): Any {
+        return value
+    }
 }

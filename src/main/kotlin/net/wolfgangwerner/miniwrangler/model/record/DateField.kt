@@ -4,6 +4,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 class DateField(private val inputFormat: String) : Field<LocalDate>() {
+
     val formatter = DateTimeFormatter.ofPattern(inputFormat)
 
     fun unmarshal(year: Int, month: Int, dayOfMonth: Int) {
@@ -21,5 +22,4 @@ class DateField(private val inputFormat: String) : Field<LocalDate>() {
     override fun unmarshal(data: String) {
         this.value = LocalDate.parse(data, formatter)
     }
-
 }
