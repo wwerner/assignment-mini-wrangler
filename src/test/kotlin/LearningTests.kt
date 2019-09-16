@@ -14,7 +14,6 @@ import kotlin.random.Random
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class LearningTests {
     @Test
-    @Disabled
     fun `can read CSV into stream`() = runBlocking {
         File("src/test/resources/orders.csv").bufferedReader().useLines { rows ->
             rows.forEach {
@@ -38,7 +37,6 @@ class LearningTests {
         for (recordCount in recordCounts) {
             createTestFile(recordCount)
             for (sleepTime in sleepTimes) {
-
                 val testFile = "src/test/resources/orders-$recordCount.csv"
                 val startAsync = System.currentTimeMillis()
                 val mockRecords = produceCsvRecordsFromFile(testFile)
