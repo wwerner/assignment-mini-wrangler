@@ -11,7 +11,7 @@ abstract class ConfigElement {
     }
 }
 
-class Transformation : ConfigElement() {
+class TransformationConfig : ConfigElement() {
 
     public fun input(init: Input.() -> Unit) = initElement(Input(), init)
     public fun records(init: Records.() -> Unit) = initElement(Records(), init)
@@ -48,8 +48,8 @@ class StdOut() : OutputChannel() {}
 class StdErr() : OutputChannel() {}
 class File(path: String) : OutputChannel() {}
 
-public fun transformation(init: Transformation.() -> Unit): Transformation {
-    val transformation = Transformation()
+public fun transformation(init: TransformationConfig.() -> Unit): TransformationConfig {
+    val transformation = TransformationConfig()
     transformation.init()
     return transformation
 }
