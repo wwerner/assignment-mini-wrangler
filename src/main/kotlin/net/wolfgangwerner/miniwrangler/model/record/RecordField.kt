@@ -10,9 +10,12 @@ abstract class RecordField<out T>(public val name: String) {
         val colData =
             config.field(name)
                 .columns
-                .map { col -> row[config.columnIndex(col)] }
+                .map {
+                    val colIdx = config.columnIndex(it)
+                    if (colIdx == -1) throw IllegalArgumentException("Column '$it' not found in record '$name'")
+                    else row[colIdx]
+                }
                 .toTypedArray()
-
         return unmarshal(*colData)
     }
 }

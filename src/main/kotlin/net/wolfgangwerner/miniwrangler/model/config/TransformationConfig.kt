@@ -1,8 +1,9 @@
 package net.wolfgangwerner.miniwrangler.model.config
 
 import net.wolfgangwerner.miniwrangler.model.record.RecordField
+import java.io.File
 
-class TransformationConfig : ConfigElement() {
+class TransformationConfig {
     internal val columns: MutableList<String> = mutableListOf<String>()
     internal val recordFields: MutableList<RecordField<Any>> = mutableListOf<RecordField<Any>>()
 
@@ -19,7 +20,14 @@ class TransformationConfig : ConfigElement() {
             .toList()
 
         // TODO: Add field name to exception
-        if (invalidBackingColumns.isNotEmpty()) throw IllegalArgumentException("Non-existing columns referenced in field definition: $invalidBackingColumns")
+        check(invalidBackingColumns.isEmpty()) { "Non-existing columns referenced in field definition: $invalidBackingColumns" }
+    }
+
+    fun ensureCsvMatches(csvFile: File) {
+        val headers = csvFile.readLines().first().split(",")
+        val invalidColumns = columns.filter { !headers.contains(it) }
+
+        require(invalidColumns.isEmpty()) { "Configuration contains columns not present in file: $invalidColumns" }
     }
 
 

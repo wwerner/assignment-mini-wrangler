@@ -24,7 +24,7 @@ class RowTransformationTests {
         "Extra Col2",
         "Empty Column"
     )
-    val exampleInput = arrayOf("1000", "2018", "1", "1", "P-10001", "Arugola", "5,250.50", "Lorem", "Ipsum", "")
+    private val exampleInput = arrayOf("1000", "2018", "1", "1", "P-10001", "Arugola", "5,250.50", "Lorem", "Ipsum", "")
     private fun exampleConfig() = TransformationConfig().apply { columns.addAll(exampleHeaders) }
 
     @Test
@@ -34,22 +34,13 @@ class RowTransformationTests {
         field.columns.add("Invalid Column")
         config.add(field)
 
-        val transformer = Transformer(config,
-            { r: Map<String, Any> -> println(r) },
-            { r: Array<String>, e: Exception -> println(e.message) }
-        )
-
-        assertThrows<IllegalArgumentException> {
-            transformer.transform(exampleInput).value("foo")
+        assertThrows<IllegalStateException> {
+            Transformer(config,
+                { r: Map<String, Any> -> println(r) },
+                { r: Array<String>, e: Exception -> println(e.message) }
+            )
         }
-
     }
-
-    @Test
-    fun `Wrong field type reports error`(): Unit = TODO("implement")
-
-    @Test
-    fun `Unknown column index reports error`(): Unit = TODO("implement")
 
     @Test
     fun `Transformer can use static fields`() {

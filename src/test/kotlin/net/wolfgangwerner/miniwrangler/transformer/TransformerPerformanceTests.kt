@@ -7,6 +7,7 @@ import net.wolfgangwerner.miniwrangler.model.config.TransformationConfig
 import net.wolfgangwerner.miniwrangler.model.record.*
 import net.wolfgangwerner.miniwrangler.transformer.Transformer
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.simpleflatmapper.csv.CsvParser
@@ -17,7 +18,7 @@ import kotlin.random.Random
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TransformerPerformanceTests {
-    val exampleHeaders = arrayOf(
+    private val exampleHeaders = arrayOf(
         "Order Number",
         "Year",
         "Month",
@@ -38,10 +39,10 @@ class TransformerPerformanceTests {
         recordFields.add(StringField("ProductName").apply { columns.addAll(arrayOf("Product Name")) })
         recordFields.add(DecimalField("Quantity", "#,##0.0#").apply { columns.addAll(arrayOf("Count")) })
         recordFields.add(StaticStringValueField("Unit", "kg"))
-
     }
 
     @Test
+    @Disabled("Only temporarily during development of other features")
     fun `compare sync and async processing`() = runBlocking {
         val recordCounts = arrayOf(100, 1_000, 10_000, 100_000, 1_000_000)
         val config = exampleConfig()

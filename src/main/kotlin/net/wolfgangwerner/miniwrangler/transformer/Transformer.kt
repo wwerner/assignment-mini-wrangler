@@ -9,6 +9,7 @@ import net.wolfgangwerner.miniwrangler.model.record.Record
 import org.simpleflatmapper.csv.CsvParser
 import java.io.File
 import java.lang.IllegalArgumentException
+import java.lang.IllegalStateException
 
 @ExperimentalCoroutinesApi
 class Transformer(
@@ -17,15 +18,19 @@ class Transformer(
     val errorListener: (row: Array<String>, exception: Exception) -> Unit = { row, ex ->
         System.err.println(
             "ERROR: ${ex.message} in ${row.joinToString(", ", "[", "]")}"
-        )
+        ) })
+{
+    init {
+        config.ensureIsValid()
     }
-) {
 
     public fun transform(csvFile: File, sync: Boolean = false) {
         try {
             config.ensureIsValid()
-        } catch (e: IllegalArgumentException) {
+            config.ensureCsvMatches(csvFile)
+        } catch (e: Exception) {
             errorListener(arrayOf<String>(), e)
+            throw e
         }
 
         if (sync) syncTransform(csvFile)
@@ -56,7 +61,6 @@ class Transformer(
     }
 
     internal fun transform(row: Array<String>): Record {
-        config.ensureIsValid()
         return Record(row, config)
     }
 
