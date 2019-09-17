@@ -12,20 +12,36 @@ import java.io.File
 class Transformer(
         private val config: TransformationConfig,
         val outputListener: (record: Map<String, Any>) -> Unit,
-        val errorListener: (row: Array<String>, exception: Exception) -> Unit = { row, ex -> println("ERROR: ${ex.message} in ${row.joinToString(", ")}") }) {
+        val errorListener: (row: Array<String>, exception: Exception) -> Unit = { row, ex -> System.err.println("ERROR: ${ex.message} in [${row.joinToString(", ")}]") }) {
 
-    public fun transform(csvFile: File) = runBlocking {
-        val rowInputChannel = produceCsvRowsFromFile(csvFile)
-        val transformerChannel = transformerChannel(rowInputChannel)
+    public fun transform(csvFile: File, sync: Boolean = false) {
+        if (sync) {
+            runBlocking {
+                val rowInputChannel = produceCsvRowsFromFile(csvFile)
+                val transformerChannel = transformerChannel(rowInputChannel, errorListener)
+
+                for (transformed in transformerChannel) {
+                    outputListener(transformed)
+                }
+            }
+        } else {
+            csvFile.bufferedReader().use { rows ->
+                CsvParser
+                        .skip(1)
+                        .stream(rows)
+                        .forEach { row ->
+                            try {
+                                outputListener(transform(row).value())
+                            } catch (e: Exception) {
+                                errorListener(row, e)
+                            }
+                        }
+            }
+        }
     }
 
-    internal fun transform(row: Array<String>) {
-        val result = Record(row, config)
-        try {
-            outputListener(result.value())
-        } catch (e: Exception) {
-            errorListener(row, e)
-        }
+    internal fun transform(row: Array<String>): Record {
+        return Record(row, config)
     }
 
 
@@ -43,10 +59,17 @@ class Transformer(
         }
     }
 
-    fun CoroutineScope.transformerChannel(inputChannel: ReceiveChannel<Array<String>>): ReceiveChannel<Deferred<Unit>> = produce {
+    fun CoroutineScope.transformerChannel(inputChannel: ReceiveChannel<Array<String>>, errorListener: (row: Array<String>, exception: Exception) -> Unit): ReceiveChannel<Map<String, Any>> = produce {
         for (row in inputChannel) {
-            async { asyncTransform(row) }
+            try {
+                val transformed =
+                        asyncTransform(row).value()
+                send(transformed)
+            } catch (e: Exception) {
+                errorListener(row, e)
+            }
         }
     }
 
 }
+

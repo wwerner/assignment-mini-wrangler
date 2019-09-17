@@ -31,7 +31,7 @@ class LearningTests {
         val sleepTimes = arrayOf(0L, 10L, 100L)
 
         val results = StringBuilder("|===\n")
-        results.append("|Rows|Transformation ms|Duration sync ms|Duration async ms\n")
+        results.append("|Rows|Transformation ms|Duration sync ms|Duration async m|async/syncs\n")
 
 
         for (recordCount in recordCounts) {
@@ -59,7 +59,11 @@ class LearningTests {
                 }
                 val endSync = System.currentTimeMillis()
 
-                results.append("|$recordCount|$sleepTime|${endSync - startSync}|${endAsync - startAsync}\n")
+                val syncDuration = endSync - startSync
+                val asyncDuration = endAsync - startAsync
+                val factor = asyncDuration.toFloat() / syncDuration.toFloat()
+                results.append("|$recordCount|$sleepTime|$syncDuration|$asyncDuration|${factor}\n")
+
             }
         }
         results.append("|===")

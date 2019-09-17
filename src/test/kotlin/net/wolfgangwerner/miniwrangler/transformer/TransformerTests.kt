@@ -36,6 +36,8 @@ class TransformerTests {
         assertThat(resultCollection).contains(mapOf("foo" to "1001"))
     }
 
+
+
     @Test
     fun `Transformer supports mixed-type records`() {
         var resultCollection = mutableListOf<Map<String, Any>>()
