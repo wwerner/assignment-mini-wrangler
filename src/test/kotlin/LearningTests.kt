@@ -116,7 +116,6 @@ class LearningTests {
             }
 
     private fun transform(row: String): String {
-        Thread.sleep(1000)
         return "[transformed] $row"
     }
 

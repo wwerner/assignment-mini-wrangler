@@ -8,12 +8,11 @@ abstract class RecordField<out T>(public val name: String) {
 
     fun unmarshal(row: Array<String>, config: TransformationConfig): T {
         val colData =
-                config.field(name)
-                        .columns
-                        .map { col -> row[config.columnIndex(col)] }
-                        .toTypedArray()
+            config.field(name)
+                .columns
+                .map { col -> row[config.columnIndex(col)] }
+                .toTypedArray()
 
         return unmarshal(*colData)
     }
-
 }

@@ -6,6 +6,7 @@ import net.wolfgangwerner.miniwrangler.transformer.Transformer
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.assertThrows
 import java.math.BigDecimal
 import java.time.LocalDate
 
@@ -27,7 +28,22 @@ class RowTransformationTests {
     private fun exampleConfig() = TransformationConfig().apply { columns.addAll(exampleHeaders) }
 
     @Test
-    fun `Unknown field reports error`(): Unit = TODO("implement")
+    fun `Unknown column reports error`(): Unit {
+        val config = TransformationConfig()
+        val field = IntegerField("foo")
+        field.columns.add("Invalid Column")
+        config.add(field)
+
+        val transformer = Transformer(config,
+            { r: Map<String, Any> -> println(r) },
+            { r: Array<String>, e: Exception -> println(e.message) }
+        )
+
+        assertThrows<IllegalArgumentException> {
+            transformer.transform(exampleInput).value("foo")
+        }
+
+    }
 
     @Test
     fun `Wrong field type reports error`(): Unit = TODO("implement")
