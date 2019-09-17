@@ -4,7 +4,7 @@ import net.wolfgangwerner.miniwrangler.model.record.RecordField
 import java.util.*
 
 class TransformationConfig : ConfigElement() {
-    internal val columns: SortedSet<String> = sortedSetOf<String>()
+    internal val columns: MutableList<String> = mutableListOf<String>()
     internal val recordFields: MutableList<RecordField<Any>> = mutableListOf<RecordField<Any>>()
 
 

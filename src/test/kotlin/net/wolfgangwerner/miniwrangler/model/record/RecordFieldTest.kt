@@ -1,9 +1,6 @@
 package test.kotlin.net.wolfgangwerner.miniwrangler.model.record
 
-import net.wolfgangwerner.miniwrangler.model.record.DateField
-import net.wolfgangwerner.miniwrangler.model.record.DecimalField
-import net.wolfgangwerner.miniwrangler.model.record.IntegerField
-import net.wolfgangwerner.miniwrangler.model.record.StringField
+import net.wolfgangwerner.miniwrangler.model.record.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -30,19 +27,19 @@ class RecordFieldTest {
 
     @Test
     fun `Date field can be parsed from pattern`() {
-        val field = DateField("f", "yyyy-MM-dd")
+        val field = FormattedDateField("f", "yyyy-MM-dd")
         assertThat(field.unmarshal("2019-08-31")).isEqualTo(LocalDate.of(2019, 8, 31))
     }
 
     @Test
     fun `Date field can be parsed from string args`() {
-        val field = DateField("f", "")
+        val field = DateField("f")
         assertThat(field.unmarshal("2019", "08", "31")).isEqualTo(LocalDate.of(2019, 8, 31))
     }
 
     @Test
     fun `Decimal field can be parsed`() {
         val field = DecimalField("f","#,##0.0#")
-        assertThat(field.unmarshal("5,250.50") as BigDecimal).isEqualByComparingTo(BigDecimal(5250.50))
+        assertThat(field.unmarshal("5,250.50")).isEqualByComparingTo(BigDecimal(5250.50))
     }
 }

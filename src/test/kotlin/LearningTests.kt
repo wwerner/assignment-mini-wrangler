@@ -51,11 +51,11 @@ class LearningTests {
                 val startSync = System.currentTimeMillis()
                 File(testFile).bufferedReader().use {
                     CsvParser
-                        .skip(1)
-                        .stream(it)
-                        .forEach { row ->
-                            log(transform(row, sleepTime).joinToString(","))
-                        }
+                            .skip(1)
+                            .stream(it)
+                            .forEach { row ->
+                                log(transform(row, sleepTime).joinToString(","))
+                            }
                 }
                 val endSync = System.currentTimeMillis()
 
@@ -107,9 +107,9 @@ class LearningTests {
     }
 
     private suspend fun asyncTransform(row: Array<String>, duration: Long): Array<String> =
-        withContext(Dispatchers.Default) {
-            transform(row, duration)
-        }
+            withContext(Dispatchers.Default) {
+                transform(row, duration)
+            }
 
     private fun transform(row: String): String {
         Thread.sleep(1000)
@@ -129,15 +129,15 @@ class LearningTests {
         var cnt = 0
         while (cnt < count) {
             send(
-                "${1000 + cnt}," +
-                        "${Random.nextInt(2016, 2020)}," +
-                        "${Random.nextInt(1, 12)}," +
-                        "${Random.nextInt(1, 31)}," +
-                        "P-${Random.nextInt(10000, 15000)}," +
-                        "${faker.food().ingredient()}," +
-                        "${faker.number().randomDouble(2, 0, 1000)}," +
-                        "${faker.hitchhikersGuideToTheGalaxy().character()}," +
-                        "${faker.hitchhikersGuideToTheGalaxy().planet()},"
+                    "${1000 + cnt}," +
+                            "${Random.nextInt(2016, 2020)}," +
+                            "${Random.nextInt(1, 12)}," +
+                            "${Random.nextInt(1, 31)}," +
+                            "P-${Random.nextInt(10000, 15000)}," +
+                            "${faker.food().ingredient()}," +
+                            "${faker.number().randomDouble(2, 0, 1000)}," +
+                            "${faker.hitchhikersGuideToTheGalaxy().character()}," +
+                            "${faker.hitchhikersGuideToTheGalaxy().planet()},"
             )
             cnt++;
         }
@@ -146,9 +146,9 @@ class LearningTests {
     private fun CoroutineScope.produceCsvRecordsFromFile(file: String) = produce<Array<String>> {
         File(file).bufferedReader().use {
             CsvParser
-                .skip(1)
-                .stream(it)
-                .forEach { row -> launch(Dispatchers.Default) { send(row) } }
+                    .skip(1)
+                    .stream(it)
+                    .forEach { row -> launch(Dispatchers.Default) { send(row) } }
         }
     }
 
@@ -160,8 +160,8 @@ class LearningTests {
     }
 
     fun CoroutineScope.transformRecord(
-        rows: ReceiveChannel<Array<String>>,
-        duration: Long
+            rows: ReceiveChannel<Array<String>>,
+            duration: Long
     ): ReceiveChannel<Deferred<Array<String>>> = produce {
         for (row in rows) {
             val transformedRow = async { asyncTransform(row, duration) }

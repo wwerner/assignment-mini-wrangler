@@ -10,7 +10,9 @@ class DecimalField(name: String, val decimalFormat: String) : RecordField<BigDec
         formatter.setParseBigDecimal(true)
     }
 
-    override fun unmarshal(vararg data: String) = unmarshal(data[0])
-    fun unmarshal(data: String) = formatter.parse(data) as BigDecimal
-
+    override fun unmarshal(vararg data: String): BigDecimal {
+        // TODO: validate
+        val value = data[0]
+        return formatter.parse(value) as BigDecimal
+    }
 }

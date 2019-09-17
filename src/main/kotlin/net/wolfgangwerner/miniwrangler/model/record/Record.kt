@@ -7,9 +7,7 @@ class Record(private val row: Array<String>, private val config: TransformationC
 
     fun value(s: String): Any {
         val field = config.field(s)
-
-        val backingColumns = field.columns.mapIndexed { idx, _ -> row[idx] }
-        return field.unmarshal(*backingColumns.toTypedArray())
+        return field.unmarshal(row, config)
     }
 
 }
