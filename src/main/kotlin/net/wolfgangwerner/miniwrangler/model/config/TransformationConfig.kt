@@ -16,7 +16,7 @@ class TransformationConfig {
     public fun ensureIsValid() {
         val invalidBackingColumns = recordFields
             .flatMap { it.columns }
-            .filter { !columns.contains(it) }
+            .filter { backingCol -> !columns.contains(backingCol) }
             .toList()
 
         // TODO: Add field name to exception
@@ -24,7 +24,7 @@ class TransformationConfig {
     }
 
     fun ensureCsvMatches(csvFile: File) {
-        val headers = csvFile.readLines().first().split(",")
+        val headers = csvFile.readLines().first().split(",") // TODO Use the csv parser here for robustness
         val invalidColumns = columns.filter { !headers.contains(it) }
 
         require(invalidColumns.isEmpty()) { "Configuration contains columns not present in file: $invalidColumns" }

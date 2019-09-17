@@ -42,7 +42,6 @@ class TransformerPerformanceTests {
     }
 
     @Test
-    @Disabled("Only temporarily during development of other features")
     fun `compare sync and async processing`() = runBlocking {
         val recordCounts = arrayOf(100, 1_000, 10_000, 100_000, 1_000_000)
         val config = exampleConfig()
@@ -80,7 +79,7 @@ class TransformerPerformanceTests {
             val factor = asyncDuration.toDouble() / syncDuration.toDouble()
             results.append("|$recordCount|$syncDuration|$asyncDuration|${factor}\n")
 
-            //TODO figure out why async is slower
+            //For quick (<10ms) row transformations, synchronous processing is faster. See README.
             //assertThat(factor).isLessThan(1.toDouble())
         }
         results.append("|===")
