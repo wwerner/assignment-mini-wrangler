@@ -1,202 +1,105 @@
 package test.kotlin.net.wolfgangwerner.miniwrangler.transformer
 
 import net.wolfgangwerner.miniwrangler.model.config.TransformationConfig
-import net.wolfgangwerner.miniwrangler.model.record.*
+import net.wolfgangwerner.miniwrangler.model.record.DateField
+import net.wolfgangwerner.miniwrangler.model.record.IntegerField
+import net.wolfgangwerner.miniwrangler.model.record.StaticStringValueField
+import net.wolfgangwerner.miniwrangler.model.record.StringField
 import net.wolfgangwerner.miniwrangler.transformer.Transformer
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import java.math.BigDecimal
+import java.io.File
 import java.time.LocalDate
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TransformerTests {
     val exampleHeaders = arrayOf("Order Number", "Year", "Month", "Day", "Product Number", "Product Name", "Count", "Extra Col1", "Extra Col2", "Empty Column")
-    val exampleInput = arrayOf("1000", "2018", "1", "1", "P-10001", "Arugola", "5,250.50", "Lorem","Ipsum", "")
+    val testFile = File("src/test/resources/orders.csv")
+
     private fun exampleConfig() = TransformationConfig().apply { columns.addAll(exampleHeaders) }
 
     @Test
-    fun `Transformer calls output handler`() {
-        var result = ""
-        val handler = { _: Record -> result = "foo" }
-        val emptyConfig = TransformationConfig()
-        val transformer = Transformer(emptyConfig, handler)
-
-        val input = arrayOf<String>()
-        transformer.transform(input)
-        assertThat(result).isEqualTo("foo")
-    }
-
-    @Test
-    fun `Unknown field reports error`(): Unit = TODO("implement")
-
-    @Test
-    fun `Wrong field type reports error`(): Unit = TODO("implement")
-
-    @Test
-    fun `Unknown column index reports error`(): Unit = TODO("implement")
-
-    @Test
-    fun `Transformer can use static fields`() {
-        var resultRecord: Record? = null
-
-        val handler = { r: Record -> resultRecord = r }
-
-        val config = TransformationConfig()
-
-        config.add(StaticStringValueField("foo", "bar"))
-        config.add(StaticStringValueField("baz", "qux"))
-        val transformer = Transformer(config, handler)
-
-        transformer.transform(exampleInput)
-
-        assertThat(resultRecord!!.value("foo")).isEqualTo("bar")
-        assertThat(resultRecord!!.value("baz")).isEqualTo("qux")
-    }
-
-    @Test
-    fun `Transformer can use date fields`() {
-        var resultRecord: Record? = null
-
-        val handler = { r: Record -> resultRecord = r }
-
-        val config = exampleConfig()
-        val field = DateField("foo")
-        field.columns.add("Year")
-        field.columns.add("Month")
-        field.columns.add("Day")
-        config.add(field)
-        val transformer = Transformer(config, handler)
-
-        transformer.transform(exampleInput)
-
-        assertThat(resultRecord!!.value("foo")).isEqualTo(LocalDate.of(2018, 1, 1))
-    }
-
-    @Test
-    fun `Transformer can use formatted date fields`() {
-        var resultRecord: Record? = null
-
-        val handler = { r: Record -> resultRecord = r }
-
-        val config = TransformationConfig()
-        config.columns.add("Date")
-
-        val field = FormattedDateField("foo", "yyyy-MM-dd")
-        field.columns.add("Date")
-        config.add(field)
-        val transformer = Transformer(config, handler)
-
-        transformer.transform(arrayOf("2018-12-31"))
-
-        assertThat(resultRecord!!.value("foo")).isEqualTo(LocalDate.of(2018, 12, 31))
-    }
-
-    @Test
-    fun `Transformer can use integer fields`() {
-        var resultRecord: Record? = null
-
-        val handler = { r: Record -> resultRecord = r }
-
-        val config = TransformationConfig()
-        config.columns.add("Integer")
-
-        val field = IntegerField("foo")
-        field.columns.add("Integer")
-        config.add(field)
-        val transformer = Transformer(config, handler)
-
-        transformer.transform(arrayOf("42"))
-
-        assertThat(resultRecord!!.value("foo")).isEqualTo(42)
-    }
-
-    @Test
-    fun `Transformer can use decimal fields`() {
-        var resultRecord: Record? = null
-
-        val handler = { r: Record -> resultRecord = r }
-
-        val config = TransformationConfig()
-        config.columns.add("Decimal")
-
-        val field = DecimalField("foo", "#,##0.0#")
-        field.columns.add("Decimal")
-        config.add(field)
-
-        val transformer = Transformer(config, handler)
-        transformer.transform(arrayOf("5,250.50"))
-
-        assertThat(resultRecord!!.value("foo") as BigDecimal).isEqualByComparingTo(BigDecimal(5250.50))
-    }
-
-    @Test
-    fun `Transformer can use simple string fields`() {
-        var resultRecord: Record? = null
-
-        val handler = { r: Record -> resultRecord = r }
+    fun `Transformer transforms complete file`() {
+        var resultCollection = mutableListOf<Map<String, Any>>()
+        val collectingHandler: (Map<String, Any>) -> Unit = { r: Map<String, Any> -> resultCollection.add(r) }
 
         val config = exampleConfig()
         val field = StringField("foo")
-        field.columns.add("Product Name")
+        field.columns.add("Order Number")
         config.add(field)
+        val transformer = Transformer(config, collectingHandler)
+        transformer.transform(testFile)
 
-        val transformer = Transformer(config, handler)
-        transformer.transform(exampleInput)
-
-        assertThat(resultRecord!!.value("foo")).isEqualTo("Arugola")
+        assertThat(resultCollection.size).isEqualTo(2)
+        assertThat(resultCollection).contains(mapOf("foo" to "1000"))
+        assertThat(resultCollection).contains(mapOf("foo" to "1001"))
     }
 
     @Test
-    fun `Transformer can prefix string fields`() {
-        var resultRecord: Record? = null
-
-        val handler = { r: Record -> resultRecord = r }
+    fun `Transformer supports mixed-type records`() {
+        var resultCollection = mutableListOf<Map<String, Any>>()
+        val collectingHandler: (Map<String, Any>) -> Unit = { r: Map<String, Any> -> resultCollection.add(r) }
 
         val config = exampleConfig()
-        val field = StringField("foo","Name: ")
-        field.columns.add("Product Name")
-        config.add(field)
+        val iField = IntegerField("i")
+        iField.columns.add("Order Number")
 
-        val transformer = Transformer(config, handler)
-        transformer.transform(exampleInput)
+        val sField = StringField("s", "", "", ": ")
+        sField.columns.add("Product Number")
+        sField.columns.add("Product Name")
 
-        assertThat(resultRecord!!.value("foo")).isEqualTo("Name: Arugola")
+        val dField = DateField("d")
+        dField.columns.add("Year")
+        dField.columns.add("Month")
+        dField.columns.add("Day")
+
+        val vField = StaticStringValueField("v", "X")
+
+        config.add(iField)
+        config.add(sField)
+        config.add(dField)
+        config.add(vField)
+
+        val transformer = Transformer(config, collectingHandler)
+        transformer.transform(testFile)
+
+        assertThat(resultCollection.size).isEqualTo(2)
+        assertThat(resultCollection).contains(mapOf(
+                "i" to 1000,
+                "s" to "P-10001: Arugola",
+                "d" to LocalDate.of(2018, 1, 1),
+                "v" to "X"
+        ))
+        assertThat(resultCollection).contains(mapOf(
+                "i" to 1001,
+                "s" to "P-10002: Iceberg lettuce",
+                "d" to LocalDate.of(2017, 12, 12),
+                "v" to "X"
+        ))
     }
 
     @Test
-    fun `Transformer can suffix string fields`() {
-        var resultRecord: Record? = null
-
-        val handler = { r: Record -> resultRecord = r }
-
-        val config = exampleConfig()
-        val field = StringField("foo",""," as name")
-        field.columns.add("Product Name")
-        config.add(field)
-
-        val transformer = Transformer(config, handler)
-        transformer.transform(exampleInput)
-
-        assertThat(resultRecord!!.value("foo")).isEqualTo("Arugola as name")
-    }
-
-    @Test
-    fun `Transformer can concat string fields`() {
-        var resultRecord: Record? = null
-
-        val handler = { r: Record -> resultRecord = r }
+    fun `Transformer supports mapping columns twice`() {
+        var resultCollection = mutableListOf<Map<String, Any>>()
+        val collectingHandler: (Map<String, Any>) -> Unit = { r: Map<String, Any> -> resultCollection.add(r) }
 
         val config = exampleConfig()
-        val field = StringField("foo","-> "," <-", " - ")
-        field.columns.add("Product Number")
-        field.columns.add("Product Name")
-        field.columns.add("Extra Col1")
-        config.add(field)
+        val iField = IntegerField("i")
+        iField.columns.add("Order Number")
 
-        val transformer = Transformer(config, handler)
-        transformer.transform(exampleInput)
+        val sField = StringField("s")
+        sField.columns.add("Order Number")
 
-        assertThat(resultRecord!!.value("foo")).isEqualTo("-> P-10001 - Arugola - Lorem <-")
+        config.add(iField)
+        config.add(sField)
+
+
+        val transformer = Transformer(config, collectingHandler)
+        transformer.transform(testFile)
+
+        assertThat(resultCollection.size).isEqualTo(2)
+        assertThat(resultCollection).contains(mapOf("i" to 1000, "s" to "1000"))
+        assertThat(resultCollection).contains(mapOf("i" to 1001, "s" to "1001"))
     }
 }
