@@ -43,7 +43,7 @@ class TransformerPerformanceTests {
 
     @Test
     fun `compare sync and async processing`() = runBlocking {
-        val recordCounts = arrayOf(100, 1_000, 10_000, 100_000, 1_000_000)
+        val recordCounts = arrayOf(100, 1_000, 10_000, 100_000, 1_000_000) // FIXME: split into one slow and one fast test
         val config = exampleConfig()
 
         val results = StringBuilder("|===\n")
