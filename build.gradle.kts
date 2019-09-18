@@ -32,8 +32,18 @@ tasks.test {
     testLogging {
         events("passed", "skipped", "failed")
     }
+}
+
+tasks.register<Test>("slowTests") {
+    useJUnitPlatform {
+        includeTags("slow")
+    }
+    testLogging {
+        events("passed", "skipped", "failed")
+    }
     maxHeapSize = "1g"
 }
+
 
 tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "11"
