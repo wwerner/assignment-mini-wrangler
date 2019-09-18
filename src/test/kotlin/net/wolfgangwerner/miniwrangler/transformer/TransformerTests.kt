@@ -26,7 +26,7 @@ class TransformerTests {
 
         val config = exampleConfig()
         val field = StringField("foo")
-        field.columns.add("Order Number")
+        field.columnRefs.add("Order Number")
         config.add(field)
         val transformer = Transformer(config, collectingHandler)
         transformer.transform(testFile)
@@ -45,16 +45,16 @@ class TransformerTests {
 
         val config = exampleConfig()
         val iField = IntegerField("i")
-        iField.columns.add("Order Number")
+        iField.columnRefs.add("Order Number")
 
         val sField = StringField("s", "", "", ": ")
-        sField.columns.add("Product Number")
-        sField.columns.add("Product Name")
+        sField.columnRefs.add("Product Number")
+        sField.columnRefs.add("Product Name")
 
         val dField = DateField("d")
-        dField.columns.add("Year")
-        dField.columns.add("Month")
-        dField.columns.add("Day")
+        dField.columnRefs.add("Year")
+        dField.columnRefs.add("Month")
+        dField.columnRefs.add("Day")
 
         val vField = StaticStringValueField("v", "X")
 
@@ -88,10 +88,10 @@ class TransformerTests {
 
         val config = exampleConfig()
         val iField = IntegerField("i")
-        iField.columns.add("Order Number")
+        iField.columnRefs.add("Order Number")
 
         val sField = StringField("s")
-        sField.columns.add("Order Number")
+        sField.columnRefs.add("Order Number")
 
         config.add(iField)
         config.add(sField)

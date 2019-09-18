@@ -5,6 +5,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.produce
 import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.simpleflatmapper.csv.CsvParser
@@ -25,6 +26,7 @@ class LearningTests {
     }
 
     @Test
+    @Tag("slow")
     @Disabled("This test runs ~4h on an i7 8 core, only enable it if you really want to run the performance comparison")
     fun `compare sync and async processing`() = runBlocking {
         val recordCounts = arrayOf(100, 1000, 10000, 100000)

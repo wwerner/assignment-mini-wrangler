@@ -2,12 +2,12 @@ package net.wolfgangwerner.miniwrangler.model.record
 
 class StringField(
         name: String,
-        val prefix: String = "",
-        val suffix: String = "",
-        val glue: String = "") : RecordField<String>(name) {
+        private val prefix: String = "",
+        private val suffix: String = "",
+        private val separator: String = "") : RecordField<String>(name) {
 
     override fun unmarshal(vararg data: String): String {
         // TODO validate
-        return data.joinToString(glue, prefix, suffix)
+        return data.joinToString(separator, prefix, suffix)
     }
 }

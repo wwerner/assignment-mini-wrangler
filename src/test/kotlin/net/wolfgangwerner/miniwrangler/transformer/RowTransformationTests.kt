@@ -31,7 +31,7 @@ class RowTransformationTests {
     fun `Unknown column reports error`(): Unit {
         val config = TransformationConfig()
         val field = IntegerField("foo")
-        field.columns.add("Invalid Column")
+        field.columnRefs.add("Invalid Column")
         config.add(field)
 
         assertThrows<IllegalStateException> {
@@ -60,9 +60,9 @@ class RowTransformationTests {
     fun `Transformer can use date fields`() {
         val config = exampleConfig()
         val field = DateField("foo")
-        field.columns.add("Year")
-        field.columns.add("Month")
-        field.columns.add("Day")
+        field.columnRefs.add("Year")
+        field.columnRefs.add("Month")
+        field.columnRefs.add("Day")
         config.add(field)
 
         val transformer = Transformer(config, {})
@@ -77,7 +77,7 @@ class RowTransformationTests {
         config.columns.add("Date")
 
         val field = FormattedDateField("foo", "yyyy-MM-dd")
-        field.columns.add("Date")
+        field.columnRefs.add("Date")
         config.add(field)
         val transformer = Transformer(config, {})
         val resultRecord = transformer.transform(arrayOf("2018-12-31"))
@@ -92,7 +92,7 @@ class RowTransformationTests {
         config.columns.add("Integer")
 
         val field = IntegerField("foo")
-        field.columns.add("Integer")
+        field.columnRefs.add("Integer")
         config.add(field)
         val transformer = Transformer(config, {})
 
@@ -107,7 +107,7 @@ class RowTransformationTests {
         config.columns.add("Decimal")
 
         val field = DecimalField("foo", "#,##0.0#")
-        field.columns.add("Decimal")
+        field.columnRefs.add("Decimal")
         config.add(field)
 
         val transformer = Transformer(config, {})
@@ -120,7 +120,7 @@ class RowTransformationTests {
     fun `Transformer can use simple string fields`() {
         val config = exampleConfig()
         val field = StringField("foo")
-        field.columns.add("Product Name")
+        field.columnRefs.add("Product Name")
         config.add(field)
 
         val transformer = Transformer(config, {})
@@ -133,7 +133,7 @@ class RowTransformationTests {
     fun `Transformer can prefix string fields`() {
         val config = exampleConfig()
         val field = StringField("foo", "Name: ")
-        field.columns.add("Product Name")
+        field.columnRefs.add("Product Name")
         config.add(field)
 
         val transformer = Transformer(config, {})
@@ -146,7 +146,7 @@ class RowTransformationTests {
     fun `Transformer can suffix string fields`() {
         val config = exampleConfig()
         val field = StringField("foo", "", " as name")
-        field.columns.add("Product Name")
+        field.columnRefs.add("Product Name")
         config.add(field)
 
         val transformer = Transformer(config, {})
@@ -159,9 +159,9 @@ class RowTransformationTests {
     fun `Transformer can concat string fields`() {
         val config = exampleConfig()
         val field = StringField("foo", "-> ", " <-", " - ")
-        field.columns.add("Product Number")
-        field.columns.add("Product Name")
-        field.columns.add("Extra Col1")
+        field.columnRefs.add("Product Number")
+        field.columnRefs.add("Product Name")
+        field.columnRefs.add("Extra Col1")
         config.add(field)
 
         val transformer = Transformer(config, {})

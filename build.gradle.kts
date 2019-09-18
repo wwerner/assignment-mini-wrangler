@@ -26,7 +26,9 @@ dependencies {
 }
 
 tasks.test {
-    useJUnitPlatform()
+    useJUnitPlatform {
+        excludeTags("slow")
+    }
     testLogging {
         events("passed", "skipped", "failed")
     }

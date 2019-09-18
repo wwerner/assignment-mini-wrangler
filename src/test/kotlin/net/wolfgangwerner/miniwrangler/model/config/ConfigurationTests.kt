@@ -3,7 +3,7 @@ package test.kotlin.net.wolfgangwerner.miniwrangler.model.config
 
 import net.wolfgangwerner.miniwrangler.model.config.TransformationConfig
 import net.wolfgangwerner.miniwrangler.model.config.TransformationConfigDsl
-import net.wolfgangwerner.miniwrangler.model.config.transformation
+import net.wolfgangwerner.miniwrangler.model.config.wrangler
 import net.wolfgangwerner.miniwrangler.model.record.IntegerField
 import net.wolfgangwerner.miniwrangler.model.record.StringField
 import net.wolfgangwerner.miniwrangler.transformer.Transformer
@@ -24,9 +24,9 @@ class ConfigurationTests {
     @Test
     fun `DSL string can be evaluated`() {
         val configDsl = scriptEngine.eval(
-            """
+                """
                 import net.wolfgangwerner.miniwrangler.model.config.*
-                transformation {}    
+                wrangler {}    
             """.trimIndent()
         ) as TransformationConfigDsl
 
@@ -38,7 +38,7 @@ class ConfigurationTests {
         val expected = TransformationConfig()
         expected.columns.addAll(arrayOf("foo", "bar", "baz"))
 
-        val configDsl = transformation {
+        val configDsl = wrangler {
             input {
                 column("foo")
                 column("bar")
@@ -51,7 +51,7 @@ class ConfigurationTests {
 
     @Test
     fun `configuration can be validated`() {
-        val configDsl = transformation {
+        val configDsl = wrangler {
             input {
                 column("foo")
                 column("bar")
@@ -65,12 +65,12 @@ class ConfigurationTests {
     fun `invalid configuration is detected`() {
         val config = TransformationConfig().apply {
             columns.addAll(arrayOf("foo", "bar"))
-            recordFields.add(IntegerField("F1").apply { columns.add("foo") })
-            recordFields.add(StringField("F2").apply { columns.add("bar") })
+            recordFields.add(IntegerField("F1").apply { columnRefs.add("foo") })
+            recordFields.add(StringField("F2").apply { columnRefs.add("bar") })
         }
         assertDoesNotThrow { config.ensureIsValid() }
 
-        config.recordFields.add(StringField("F3").apply { columns.add("baz") })
+        config.recordFields.add(StringField("F3").apply { columnRefs.add("baz") })
         assertThrows<IllegalStateException> {
             config.ensureIsValid()
         }
@@ -83,8 +83,8 @@ class ConfigurationTests {
 
         val config = TransformationConfig().apply {
             columns.addAll(arrayOf("foo", "bar"))
-            recordFields.add(IntegerField("F1").apply { columns.add("foo") })
-            recordFields.add(StringField("F2").apply { columns.add("bar") })
+            recordFields.add(IntegerField("F1").apply { columnRefs.add("foo") })
+            recordFields.add(StringField("F2").apply { columnRefs.add("bar") })
         }
         assertDoesNotThrow { config.ensureIsValid() }
 
@@ -100,9 +100,9 @@ class ConfigurationTests {
         val expected = TransformationConfig()
         expected.add(IntegerField("qux"))
 
-        val configDsl = transformation {
+        val configDsl = wrangler {
             record {
-                intField("qux") from "qux"
+                field("qux").integerFrom("qux")
 
             }
         }

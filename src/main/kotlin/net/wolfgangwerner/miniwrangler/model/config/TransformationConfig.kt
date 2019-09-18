@@ -11,12 +11,18 @@ class TransformationConfig {
     public fun columnIndex(name: String) = columns.indexOf(name)
 
     public fun add(field: RecordField<Any>) = recordFields.add(field)
+    public fun add(field: RecordField<Any>, vararg colRefs: String) {
+        field.columnRefs.addAll(colRefs)
+        recordFields.add(field)
+
+    }
+
     public fun field(name: String) = recordFields.first { rf -> rf.name == name }  // TODO: Optimize?
 
     public fun ensureIsValid() {
         val invalidBackingColumns = recordFields
-            .flatMap { it.columns }
-            .filter { backingCol -> !columns.contains(backingCol) }
+            .flatMap { it.columnRefs }
+            .filter { ref -> !columns.contains(ref) }
             .toList()
 
         // TODO: Add field name to exception

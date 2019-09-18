@@ -7,7 +7,7 @@ import net.wolfgangwerner.miniwrangler.model.config.TransformationConfig
 import net.wolfgangwerner.miniwrangler.model.record.*
 import net.wolfgangwerner.miniwrangler.transformer.Transformer
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.simpleflatmapper.csv.CsvParser
@@ -33,17 +33,26 @@ class TransformerPerformanceTests {
 
     private fun exampleConfig() = TransformationConfig().apply {
         columns.addAll(exampleHeaders)
-        recordFields.add(IntegerField("OrderID").apply { columns.add("Order Number") })
-        recordFields.add(DateField("OrderDate").apply { columns.addAll(arrayOf("Year", "Month", "Day")) })
-        recordFields.add(StringField("ProductId").apply { columns.addAll(arrayOf("Product Number")) })
-        recordFields.add(StringField("ProductName").apply { columns.addAll(arrayOf("Product Name")) })
-        recordFields.add(DecimalField("Quantity", "#,##0.0#").apply { columns.addAll(arrayOf("Count")) })
+        recordFields.add(IntegerField("OrderID").apply { columnRefs.add("Order Number") })
+        recordFields.add(DateField("OrderDate").apply { columnRefs.addAll(arrayOf("Year", "Month", "Day")) })
+        recordFields.add(StringField("ProductId").apply { columnRefs.addAll(arrayOf("Product Number")) })
+        recordFields.add(StringField("ProductName").apply { columnRefs.addAll(arrayOf("Product Name")) })
+        recordFields.add(DecimalField("Quantity", "#,##0.0#").apply { columnRefs.addAll(arrayOf("Count")) })
         recordFields.add(StaticStringValueField("Unit", "kg"))
     }
 
     @Test
-    fun `compare sync and async processing`() = runBlocking {
-        val recordCounts = arrayOf(100, 1_000, 10_000, 100_000, 1_000_000) // FIXME: split into one slow and one fast test
+    fun `compare sync and async processing with small files`() = runBlocking {
+        runComparison(arrayOf(100, 1_000, 10_000))
+    }
+
+    @Test
+    @Tag("slow")
+    fun `compare sync and async processing with large files`() = runBlocking {
+        runComparison(arrayOf(100_000, 1_000_000))
+    }
+
+    private fun runComparison(recordCounts: Array<Int>) = runBlocking {
         val config = exampleConfig()
 
         val results = StringBuilder("|===\n")
@@ -55,9 +64,9 @@ class TransformerPerformanceTests {
 
             val testFile = createTestFile(recordCount)
             val transformer = Transformer(
-                config,
-                { _: Map<String, Any> -> resultCount.getAndIncrement() },
-                { _: Array<String>, _: Exception -> errorCount.getAndIncrement() }
+                    config,
+                    { _: Map<String, Any> -> resultCount.getAndIncrement() },
+                    { _: Array<String>, _: Exception -> errorCount.getAndIncrement() }
             )
 
             val startSync = System.currentTimeMillis()
