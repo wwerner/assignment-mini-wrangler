@@ -1,5 +1,4 @@
 import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
-import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val kotlinVersion = plugins.getPlugin(KotlinPluginWrapper::class.java).kotlinPluginVersion
@@ -31,6 +30,7 @@ tasks.test {
     testLogging {
         events("passed", "skipped", "failed")
     }
+    maxHeapSize = "1g"
 }
 
 tasks.withType<KotlinCompile> {
