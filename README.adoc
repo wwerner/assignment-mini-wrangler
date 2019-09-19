@@ -215,7 +215,7 @@ We're using the raw parser flavor as not to ...
 
 **Consequences**
 
-=== [[adr-n]]ADR 6: Don't use infix functions in the record definition DSL
+=== [[adr-6]]ADR 6: Don't use infix functions in the record definition DSL
 
 **Context**
 
@@ -229,7 +229,7 @@ However, since https://kotlinlang.org/docs/reference/functions.html#infix-notati
 
 **Consequences**
 
-=== [[adr-n]]ADR n:
+=== [[adr-7]]ADR 7: Minimize coupling w/ CSV parser
 
 **Status:** proposed
 
@@ -247,5 +247,10 @@ However, since https://kotlinlang.org/docs/reference/functions.html#infix-notati
 
 == Next Steps
 
-* Try returning a stream instead of using callbacks for result (and possibly error) handlers
+* Try returning a stream instead of using callbacks for result (and possibly error) handlers as an alternative
 * Improve DSL validation
+* Refactor Tests to use parameterized tests, e.g. for field validations
+* Support transformations for `Records` and factor out `StringField`  concatenations, product name casing and `StaticStringValueField` (support all types of static values)
+* Introduce own exception hierarchy instead of using (only) stock exceptions.
+* Support better parsing for dates, perhaps merge `DateField` and `FormattedDateField`
+* Generally make a better distinction between field types and transformations

@@ -44,7 +44,7 @@ class RowTransformationTests {
 
     @Test
     fun `Transformer can use static fields`() {
-        val config = TransformationConfig()
+        val config = exampleConfig()
 
         config.add(StaticStringValueField("foo", "bar"))
         config.add(StaticStringValueField("baz", "qux"))
