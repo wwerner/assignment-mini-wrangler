@@ -50,6 +50,9 @@ class Field(private val config: TransformationConfig, private val name: String) 
     fun stringFrom(column: String) =
         config.add(StringField(name), column)
 
+    fun productNameFrom(column: String) =
+        config.add(ProductNameField(name), column)
+
     fun concatenationFrom(separator: String = "", prefix: String = "", suffix: String = "", vararg columns: String) =
         config.add(StringField(prefix, suffix, separator, name), *columns)
 

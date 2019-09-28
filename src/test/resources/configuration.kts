@@ -17,7 +17,7 @@ wrangler {
         field("OrderID").integerFrom("Order Number")
         field("OrderDate").dateFrom("Year", "Month", "Day")
         field("ProductId").stringFrom("Product Number")
-        field("ProductName").stringFrom("Product Name")
+        field("ProductName").productNameFrom("Product Name")
         field("Quantity").decimalFrom("Count", "#,##0.0#")
         field("Unit").staticStringFrom("kg")
     }
