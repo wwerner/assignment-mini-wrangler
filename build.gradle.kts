@@ -1,1 +1,5 @@
-
+allprojects {
+    repositories {
+        mavenCentral()
+    }
+}
