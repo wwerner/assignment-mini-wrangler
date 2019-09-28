@@ -9,17 +9,17 @@ import java.io.File
 import java.util.concurrent.Callable
 
 
-@CommandLine.Command(name = "Wrangler", version = ["0.0.1"],
+@CommandLine.Command(name = "mini-wrangle-cli", version = ["0.0.1"],
     mixinStandardHelpOptions = true,
     description = ["Crisp Mini Wrangler - CLI Demo"])
 class Wrangler : Callable<Int> {
 
-    @Option(names = ["-c", "--config"], paramLabel = "<path to configuration file>",
+    @Option(names = ["-c", "--config"], paramLabel = "<configuration file>",
         required = true,
         description = ["Configuration file, see README for syntax"])
     private var config: String = ""
 
-    @Option(names = ["-i", "--input", "--csv"], paramLabel = "<path to CSV file>",
+    @Option(names = ["-i", "--input", "--csv"], paramLabel = "<CSV file>",
         required = true,
         description = ["CSV file to process"])
     private var input: String = ""
