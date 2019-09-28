@@ -7,6 +7,7 @@ import net.wolfgangwerner.miniwrangler.transformer.Transformer
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.assertThrows
 import java.io.File
 import java.text.ParseException
 import java.time.LocalDate
@@ -253,4 +254,29 @@ class TransformerTests {
         assertThat(errorRow).isEqualTo(arrayOf("this is not a valid row"))
     }
 
+    @Test
+    fun `Transformer reports invalid configuration file`() {
+        val configFile = File("src/test/resources/orders.csv")
+
+        assertThrows<java.lang.IllegalStateException> {
+            val transformer = Transformer(configFile, {})
+        }
+    }
+
+
+    @Test
+    fun `Transformer can use configuration file`() {
+        val configFile = File("src/test/resources/configuration.kts")
+        val resultCollection = mutableListOf<String>()
+        val csvLineCollector: (Map<String, Any>) -> Unit = { r: Map<String, Any> ->
+            resultCollection.add(r.values.joinToString(","))
+        }
+
+        val transformer = Transformer(configFile, csvLineCollector)
+        transformer.transform(testFile)
+
+        assertThat(resultCollection.size).isEqualTo(2)
+        assertThat(resultCollection).contains("1000,2018-01-01,P-10001,Arugola,5250.50,kg")
+        assertThat(resultCollection).contains("1001,2017-12-12,P-10002,Iceberg Lettuce,500.00,kg")
+    }
 }

@@ -5,9 +5,12 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.channels.produce
 import net.wolfgangwerner.miniwrangler.model.config.TransformationConfig
+import net.wolfgangwerner.miniwrangler.model.config.TransformationConfigDsl
 import net.wolfgangwerner.miniwrangler.model.record.Record
 import org.simpleflatmapper.csv.CsvParser
 import java.io.File
+import javax.script.ScriptEngine
+import javax.script.ScriptEngineManager
 
 @ExperimentalCoroutinesApi
 class Transformer(
@@ -22,6 +25,16 @@ class Transformer(
     init {
         config.ensureIsValid()
     }
+
+    constructor(
+        configFile: File,
+        outputListener: (record: Map<String, Any>) -> Unit,
+        errorListener: (row: Array<String>, exception: Exception) -> Unit = { row, ex ->
+            System.err.println(
+                "ERROR: ${ex.message} in ${row.joinToString(", ", "[", "]")}"
+            )
+        }
+    ) : this(parseConfig(configFile), outputListener, errorListener)
 
     public fun transform(csvFile: File, sync: Boolean = false) {
         try {
@@ -94,6 +107,24 @@ class Transformer(
                 errorListener(row, e)
             }
         }
+    }
+
+    companion object {
+        private val engine: ScriptEngine =
+            ScriptEngineManager(Thread.currentThread().contextClassLoader).getEngineByExtension("kts")
+
+        private fun parseConfig(configFile: File): TransformationConfig {
+            try {
+                val configDsl = engine.eval(configFile.readText()).takeIf { it is TransformationConfigDsl }
+                    ?.let { it as TransformationConfigDsl }
+                    ?: throw IllegalArgumentException("Cannot parse ${configFile.path} as TransformationConfiguration")
+
+                return configDsl.config
+            } catch (e: Exception) {
+                throw IllegalStateException("Cannot load script", e)
+            }
+        }
+
     }
 
 }
