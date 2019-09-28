@@ -18,6 +18,17 @@ WARNING: You'll need JDK11 installed an on the path for this to work.
 
 == Usage
 
+After having built the application, you can run the CLI it against the included test data and configuration (or provide your own).
+
+[source, bash]
+```
+# 100k rows, async
+project root $ ./mini-wrangler-cli/build/distributions/mini-wrangler-cli/bin/mini-wrangler-cli --input demo/100k-orders.csv -c demo/orders-config.kts --async
+
+# 1M rows, sync
+project root $ ./mini-wrangler-cli/build/distributions/mini-wrangler-cli/bin/mini-wrangler-cli --input demo/1M-orders.csv -c demo/orders-config.kts
+```
+
 === CLI
 
 The CLI is just an example consumer of the wrangler library to show its usage.
