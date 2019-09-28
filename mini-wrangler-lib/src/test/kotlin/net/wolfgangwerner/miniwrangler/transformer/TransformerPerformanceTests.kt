@@ -47,7 +47,7 @@ class TransformerPerformanceTests {
     }
 
     @Test
-    @Tag("slow")
+    @Tag("measurement")
     fun `compare sync and async processing with large files`() = runBlocking {
         runComparison(arrayOf(100_000, 1_000_000))
     }

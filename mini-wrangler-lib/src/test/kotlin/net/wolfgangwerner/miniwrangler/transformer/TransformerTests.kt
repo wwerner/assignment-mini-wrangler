@@ -272,7 +272,7 @@ class TransformerTests {
             resultCollection.add(r.values.joinToString(","))
         }
 
-        val transformer = Transformer(configFile, csvLineCollector)
+        val transformer = Transformer(configFile, csvLineCollector, {_,_->})
         transformer.transform(testFile)
 
         assertThat(resultCollection.size).isEqualTo(2)

@@ -27,7 +27,7 @@ class LearningTests {
     }
 
     @Test
-    @Tag("slow")
+    @Tag("measurement")
     @Disabled("This test runs ~4h on an i7 8 core, only enable it if you really want to run the performance comparison")
     fun `compare sync and async processing`() = runBlocking {
         val recordCounts = arrayOf(100, 1000, 10000, 100000)
