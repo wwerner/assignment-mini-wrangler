@@ -4,7 +4,7 @@ import net.wolfgangwerner.miniwrangler.model.config.TransformationConfig
 
 abstract class RecordField<out T>(public val name: String) {
     val columnRefs: MutableList<String> = mutableListOf()
-    abstract fun unmarshal(vararg parameters: String): T
+    abstract fun unmarshal(vararg data: String): T
 
     fun unmarshal(row: Array<String>, config: TransformationConfig): T {
         val colData =

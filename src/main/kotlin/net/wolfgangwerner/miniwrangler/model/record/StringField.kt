@@ -7,7 +7,6 @@ class StringField(
         private val separator: String = "") : RecordField<String>(name) {
 
     override fun unmarshal(vararg data: String): String {
-        // TODO validate
         return data.joinToString(separator, prefix, suffix)
     }
 }

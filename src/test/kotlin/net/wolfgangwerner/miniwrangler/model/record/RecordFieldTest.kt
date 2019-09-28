@@ -39,7 +39,7 @@ class RecordFieldTest {
 
     @Test
     fun `Decimal field can be parsed`() {
-        val field = DecimalField("f","#,##0.0#")
+        val field = DecimalField("f", "#,##0.0#")
         assertThat(field.unmarshal("5,250.50")).isEqualByComparingTo(BigDecimal(5250.50))
     }
 }

@@ -64,9 +64,9 @@ class TransformerPerformanceTests {
 
             val testFile = createTestFile(recordCount)
             val transformer = Transformer(
-                    config,
-                    { _: Map<String, Any> -> resultCount.getAndIncrement() },
-                    { _: Array<String>, _: Exception -> errorCount.getAndIncrement() }
+                config,
+                { _: Map<String, Any> -> resultCount.getAndIncrement() },
+                { _: Array<String>, _: Exception -> errorCount.getAndIncrement() }
             )
 
             val startSync = System.currentTimeMillis()

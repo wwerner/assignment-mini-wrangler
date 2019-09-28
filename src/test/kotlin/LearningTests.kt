@@ -12,6 +12,7 @@ import org.simpleflatmapper.csv.CsvParser
 import java.io.File
 import kotlin.random.Random
 
+@ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class LearningTests {
     @Test

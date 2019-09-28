@@ -33,25 +33,25 @@ class Record(private val config: TransformationConfig) : ConfigElement() {
 
 class Field(private val config: TransformationConfig, private val name: String) {
     fun dateFrom(year: String, month: String, dayOfMonth: String) =
-            config.add(DateField(name), year, month, dayOfMonth)
+        config.add(DateField(name), year, month, dayOfMonth)
 
     fun decimalFrom(column: String, pattern: String) =
-            config.add(DecimalField(name, pattern), column)
+        config.add(DecimalField(name, pattern), column)
 
     fun formattedDateFrom(column: String, pattern: String) =
-            config.add(FormattedDateField(name, pattern), column)
+        config.add(FormattedDateField(name, pattern), column)
 
     fun integerFrom(column: String) =
-            config.add(IntegerField(name), column)
+        config.add(IntegerField(name), column)
 
     fun staticStringFrom(value: String) =
-            config.add(StaticStringValueField(name, value))
+        config.add(StaticStringValueField(name, value))
 
     fun stringFrom(column: String) =
-            config.add(StringField(name), column)
+        config.add(StringField(name), column)
 
     fun concatenationFrom(separator: String = "", prefix: String = "", suffix: String = "", vararg columns: String) =
-            config.add(StringField(prefix, suffix, separator, name), *columns)
+        config.add(StringField(prefix, suffix, separator, name), *columns)
 
 }
 

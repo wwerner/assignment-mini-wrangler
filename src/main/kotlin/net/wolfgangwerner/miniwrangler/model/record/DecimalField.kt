@@ -3,10 +3,14 @@ package net.wolfgangwerner.miniwrangler.model.record
 import java.math.BigDecimal
 import java.text.DecimalFormat
 
-class DecimalField(name: String, val decimalFormat: String, val groupingSeparator: Char = ',', val decimalSeparator: Char = '.') : RecordField<BigDecimal>(name) {
+class DecimalField(
+    name: String,
+    private val decimalFormat: String,
+    private val groupingSeparator: Char = ',',
+    private val decimalSeparator: Char = '.'
+) : RecordField<BigDecimal>(name) {
 
     override fun unmarshal(vararg data: String): BigDecimal {
-        // TODO: validate
         val value = data[0]
 
         // This looks like it could be written more concise, but...

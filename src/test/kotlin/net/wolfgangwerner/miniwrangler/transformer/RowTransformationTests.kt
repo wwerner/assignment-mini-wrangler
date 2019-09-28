@@ -1,5 +1,6 @@
 package test.kotlin.net.wolfgangwerner.miniwrangler.transformer
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import net.wolfgangwerner.miniwrangler.model.config.TransformationConfig
 import net.wolfgangwerner.miniwrangler.model.record.*
 import net.wolfgangwerner.miniwrangler.transformer.Transformer
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.assertThrows
 import java.math.BigDecimal
 import java.time.LocalDate
 
+@ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class RowTransformationTests {
     val exampleHeaders = arrayOf(

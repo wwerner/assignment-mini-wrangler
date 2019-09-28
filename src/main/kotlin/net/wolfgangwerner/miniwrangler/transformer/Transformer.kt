@@ -11,13 +11,14 @@ import java.io.File
 
 @ExperimentalCoroutinesApi
 class Transformer(
-        private val config: TransformationConfig,
-        val outputListener: (record: Map<String, Any>) -> Unit,
-        val errorListener: (row: Array<String>, exception: Exception) -> Unit = { row, ex ->
-            System.err.println(
-                    "ERROR: ${ex.message} in ${row.joinToString(", ", "[", "]")}"
-            )
-        }) {
+    private val config: TransformationConfig,
+    val outputListener: (record: Map<String, Any>) -> Unit,
+    val errorListener: (row: Array<String>, exception: Exception) -> Unit = { row, ex ->
+        System.err.println(
+            "ERROR: ${ex.message} in ${row.joinToString(", ", "[", "]")}"
+        )
+    }
+) {
     init {
         config.ensureIsValid()
     }
@@ -28,7 +29,7 @@ class Transformer(
             config.ensureCsvMatches(csvFile)
         } catch (e: Exception) {
             errorListener(arrayOf<String>(), e)
-            throw e
+            throw e // rethrow as we can't start the transformation with invalid config/file
         }
 
         if (sync) syncTransform(csvFile)
@@ -46,48 +47,48 @@ class Transformer(
     private fun syncTransform(csvFile: File) {
         csvFile.bufferedReader().use { rows ->
             CsvParser
-                    .skip(1)
-                    .stream(rows)
-                    .forEach { row ->
-                        try {
-                            outputListener(transform(row).value())
-                        } catch (e: Exception) {
-                            errorListener(row, e)
-                        }
+                .skip(1)
+                .stream(rows)
+                .forEach { row ->
+                    try {
+                        outputListener(transform(row).value())
+                    } catch (e: Exception) {
+                        errorListener(row, e)
                     }
+                }
         }
     }
 
     internal fun transform(row: Array<String>): Record {
-        if (row.size !== config.columns.size) {
-            throw IllegalStateException("Row columns do not match configuration: " + row.joinToString(",", "[", "]"))
+        check(!(row.size !== config.columns.size)) {
+            "Row columns do not match configuration: " + row.joinToString(",", "[", "]")
         }
         return Record(row, config)
     }
 
 
     private suspend fun asyncTransform(row: Array<String>) =
-            withContext(Dispatchers.Default) {
-                transform(row)
-            }
+        withContext(Dispatchers.Default) {
+            transform(row)
+        }
 
     private fun CoroutineScope.produceCsvRowsFromFile(file: File) = produce<Array<String>> {
         file.bufferedReader().use {
             CsvParser
-                    .skip(1)
-                    .stream(it)
-                    .forEach { row -> launch(Dispatchers.Default) { send(row) } }
+                .skip(1)
+                .stream(it)
+                .forEach { row -> launch(Dispatchers.Default) { send(row) } }
         }
     }
 
     private fun CoroutineScope.transformerChannel(
-            inputChannel: ReceiveChannel<Array<String>>,
-            errorListener: (row: Array<String>, exception: Exception) -> Unit
+        inputChannel: ReceiveChannel<Array<String>>,
+        errorListener: (row: Array<String>, exception: Exception) -> Unit
     ): ReceiveChannel<Map<String, Any>> = produce {
         for (row in inputChannel) {
             try {
                 val transformed =
-                        asyncTransform(row).value()
+                    asyncTransform(row).value()
                 send(transformed)
             } catch (e: Exception) {
                 errorListener(row, e)

@@ -1,6 +1,7 @@
 package test.kotlin.net.wolfgangwerner.miniwrangler.model.config
 
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import net.wolfgangwerner.miniwrangler.model.config.TransformationConfig
 import net.wolfgangwerner.miniwrangler.model.config.TransformationConfigDsl
 import net.wolfgangwerner.miniwrangler.model.config.wrangler
@@ -17,6 +18,7 @@ import javax.script.ScriptEngine
 import javax.script.ScriptEngineManager
 
 
+@ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ConfigurationTests {
     private val scriptEngine: ScriptEngine = ScriptEngineManager().getEngineByExtension("kts")!!
@@ -24,7 +26,7 @@ class ConfigurationTests {
     @Test
     fun `DSL string can be evaluated`() {
         val configDsl = scriptEngine.eval(
-                """
+            """
                 import net.wolfgangwerner.miniwrangler.model.config.*
                 wrangler {}    
             """.trimIndent()
@@ -70,9 +72,15 @@ class ConfigurationTests {
         }
         assertDoesNotThrow { config.ensureIsValid() }
 
-        config.recordFields.add(StringField("F3").apply { columnRefs.add("baz") })
+        config.recordFields.add(StringField("F3").apply { columnRefs.addAll(arrayOf("baz","qux")) })
+        config.recordFields.add(StringField("F4").apply { columnRefs.addAll(arrayOf("bar","baz")) })
         assertThrows<IllegalStateException> {
-            config.ensureIsValid()
+            try {
+                config.ensureIsValid()
+            } catch (e:Exception) {
+                System.err.println(e)
+                throw e
+            }
         }
     }
 

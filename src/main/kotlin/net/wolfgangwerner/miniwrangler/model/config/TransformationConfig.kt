@@ -1,11 +1,15 @@
 package net.wolfgangwerner.miniwrangler.model.config
 
 import net.wolfgangwerner.miniwrangler.model.record.RecordField
+import org.simpleflatmapper.csv.CsvParser
 import java.io.File
 
 class TransformationConfig {
     internal val columns: MutableList<String> = mutableListOf<String>()
     internal val recordFields: MutableList<RecordField<Any>> = mutableListOf<RecordField<Any>>()
+    private val recordFieldIndex: Map<String, RecordField<Any>> by lazy {
+        recordFields.associateBy { it.name }
+    }
 
 
     public fun columnIndex(name: String) = columns.indexOf(name)
@@ -17,20 +21,21 @@ class TransformationConfig {
 
     }
 
-    public fun field(name: String) = recordFields.first { rf -> rf.name == name }  // TODO: Optimize?
+    public fun field(name: String): RecordField<Any> = recordFieldIndex[name] ?: error("Invalid field $name requested")
 
     public fun ensureIsValid() {
-        val invalidBackingColumns = recordFields
-            .flatMap { it.columnRefs }
-            .filter { ref -> !columns.contains(ref) }
-            .toList()
+        val errorMessage = recordFields
+            .filter { !columns.containsAll(it.columnRefs) }
+            .map { Pair(it.name, it.columnRefs.subtract(columns)) }
+            .joinToString(separator = "\n\t", transform = {
+                it.first + ' ' + it.second.joinToString(", ", "[", "]")
+            })
 
-        // TODO: Add field name to exception
-        check(invalidBackingColumns.isEmpty()) { "Non-existing columns referenced in field definition: $invalidBackingColumns" }
+        check(errorMessage.isEmpty()) { "Invalid columns in field configuration:\n\t$errorMessage" }
     }
 
     fun ensureCsvMatches(csvFile: File) {
-        val headers = csvFile.readLines().first().split(",") // TODO Use the csv parser here for robustness
+        val headers: Array<String> = CsvParser.iterator(csvFile).next()
         val invalidColumns = columns.filter { !headers.contains(it) }
 
         require(invalidColumns.isEmpty()) { "Configuration contains columns not present in file: $invalidColumns" }
