@@ -259,7 +259,7 @@ class TransformerTests {
         val configFile = File("src/test/resources/orders.csv")
 
         assertThrows<java.lang.IllegalStateException> {
-            val transformer = Transformer(configFile, {})
+            Transformer(configFile, {})
         }
     }
 

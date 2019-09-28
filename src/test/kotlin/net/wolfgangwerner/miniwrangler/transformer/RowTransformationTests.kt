@@ -26,7 +26,10 @@ class RowTransformationTests {
         "Extra Col2",
         "Empty Column"
     )
-    private val exampleInput = arrayOf("1000", "2018", "1", "1", "P-10001", "Arugola", "5,250.50", "Lorem", "Ipsum", "")
+    private val exampleInput =
+        arrayOf("1000", "2018", "1", "1", "P-10001", "Arugola", "5,250.50", "Lorem", "Ipsum", "")
+
+
     private fun exampleConfig() = TransformationConfig().apply { columns.addAll(exampleHeaders) }
 
     @Test
@@ -39,7 +42,7 @@ class RowTransformationTests {
         assertThrows<IllegalStateException> {
             Transformer(config,
                 { r: Map<String, Any> -> println(r) },
-                { r: Array<String>, e: Exception -> println(e.message) }
+                { _: Array<String>, e: Exception -> println(e.message) }
             )
         }
     }

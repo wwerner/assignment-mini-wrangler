@@ -73,8 +73,8 @@ class Transformer(
     }
 
     internal fun transform(row: Array<String>): Record {
-        check(!(row.size !== config.columns.size)) {
-            "Row columns do not match configuration: " + row.joinToString(",", "[", "]")
+        check(row.size == config.columns.size) {
+            "Row columns do not match configuration: " + row.joinToString("','", "['", "']")
         }
         return Record(row, config)
     }

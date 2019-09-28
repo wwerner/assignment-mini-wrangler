@@ -61,6 +61,8 @@ class ConfigurationTests {
             }
             record { }
         }
+
+        assertThat(configDsl.config.ensureIsValid())
     }
 
     @Test
