@@ -29,19 +29,20 @@ tasks.jar {}
 
 tasks.test {
     useJUnitPlatform {
-        excludeTags("slow")
+        excludeTags("measurement")
     }
     testLogging {
         events("passed", "skipped", "failed")
     }
 }
 
-tasks.register<Test>("slowTests") {
+tasks.register<Test>("measurePerformance") {
     useJUnitPlatform {
-        includeTags("slow")
+        includeTags("measurement")
     }
     testLogging {
         events("passed", "skipped", "failed")
+        showStandardStreams = true
     }
     maxHeapSize = "1g"
 }
