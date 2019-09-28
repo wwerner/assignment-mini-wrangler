@@ -5,6 +5,7 @@ class StaticStringValueField(
     private val value: String = ""
 ) : RecordField<String>(name) {
     override fun unmarshal(vararg data: String): String {
+        check(data.isEmpty())
         return value
     }
 }

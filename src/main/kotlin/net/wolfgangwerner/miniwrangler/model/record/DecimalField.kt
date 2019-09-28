@@ -11,6 +11,7 @@ class DecimalField(
 ) : RecordField<BigDecimal>(name) {
 
     override fun unmarshal(vararg data: String): BigDecimal {
+        check(data.size == 1)
         val value = data[0]
 
         // This looks like it could be written more concise, but...

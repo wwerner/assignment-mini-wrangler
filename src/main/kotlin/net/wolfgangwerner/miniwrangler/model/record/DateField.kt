@@ -7,11 +7,13 @@ class DateField(name: String) : RecordField<LocalDate>(name) {
 
 
     override fun unmarshal(vararg data: String): LocalDate {
+        check(data.size == 3)
+
         val year = data[0]
         val month = data[1]
         val dayOfMonth = data[2]
 
-        val date = try {
+        return try {
             LocalDate.of(
                 Integer.parseInt(year),
                 Integer.parseInt(month),
@@ -25,6 +27,5 @@ class DateField(name: String) : RecordField<LocalDate>(name) {
                 e
             )
         }
-        return date
     }
 }
