@@ -25,6 +25,8 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:5.5.2")
 }
 
+tasks.jar {}
+
 tasks.test {
     useJUnitPlatform {
         excludeTags("slow")

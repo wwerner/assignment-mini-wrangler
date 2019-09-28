@@ -2,3 +2,7 @@ Crisp - Backend Take Home Test.pdf
 .gradle
 .idea
 mini-wrangler-lib/build/
+.DS_Store
+build/
+mini-wrangler-lib/.DS_Store
+mini-wrangler-lib/out
