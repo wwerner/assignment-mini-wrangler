@@ -6,3 +6,4 @@ mini-wrangler-lib/build/
 build/
 mini-wrangler-lib/.DS_Store
 mini-wrangler-lib/out
+mini-wrangler-cli/out/
