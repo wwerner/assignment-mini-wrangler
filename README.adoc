@@ -1,8 +1,14 @@
-= crisp-mini-wrangler
+= Take Home Assignment - Mini CSV Wrangler
+
 :icons: font
 
+This is from a take home assignment of a company I applied with once.
 
-Crisp Take Home Assignment - Mini CSV Wrangler
+It implements a small system for (row-wise) wrangling of text data. The typical use case is taking a delimited data file from a customer and massaging it to fit with a standardized schema by applying a sequence of column transforms.
+
+It reads a CSV file containing product and stock data, parses it and transforms its contents into JVM types. The transformations are specified in an external DSL.
+
+It supports running asynchronously as well as synchronously and has some (navive) performance measurements to help decide when it makes sense to run in parallel. For the implementation, I used Kotlin Coroutines for the transformation library and the DSL and PicoCLI to build an example app consuming the library.
 
 == TL;DR
 
